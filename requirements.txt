@@ -1,0 +1,10 @@
+Flask==2.0.2
+chatterbot==1.0.5
+opencv-python==4.5.3.56
+numpy==1.21.2
+folium==0.12.1
+requests==2.26.0
+googletrans==4.0.0-rc1
+transformers==4.13.0
+gtts==2.2.3
+sentencepiece==0.1.96
