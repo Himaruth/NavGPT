@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map with Traffic and Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            align-items: stretch;
+        }
+
+        .sidebar, .map-container, .video-container {
+            padding: 20px;
+        }
+
+        .sidebar, .video-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 10px;
+        }
+
+        .map-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 10px;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: calc(33.33% - 20px); /* One-third of the sidebar width minus padding */
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #333;
+            color: #fff;
+        }
+
+        button[type="submit"], #send-button {
+            width: calc(33.33% - 20px); /* One-third of the sidebar width minus padding */
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover, #send-button:hover {
+            background-color: #2980b9;
+        }
+
+        #userInput {
+            width: calc(100% - 70px);
+        }
+
+        #map {
+            height: calc(50vh - 120px);
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #video-feed {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+
+        #chat {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            max-height: calc(50vh - 150px); /* Adjusted height to make space for messages */
+            overflow-y: auto;
+            width: calc(33.33% - 20px); /* One-third of the sidebar width minus padding */
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.8); /* Background color for chatbox */
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        .chat-message {
+            margin-bottom: 10px; /* Add margin between messages */
+            padding: 5px 10px; /* Padding for messages */
+            border-radius: 5px; /* Border radius for messages */
+        }
+
+        .chatbot-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="chatbot-container">
+                <div>
+                    <h2>Map Search</h2>
+                    <form action="/" method="post">
+                        <input type="text" name="source_address" placeholder="Enter source address...">
+                        <h2>Destination</h2>
+                        <input type="text" name="destination_address" placeholder="Enter destination address...">
+                        <button type="submit">Update Map</button>
+                    </form>
+                </div>
+                <div id="chat">
+                    <h2>Chatbot</h2>
+                    <input type="text" id="userInput" placeholder="Type your message...">
+                    <button id="send-button" onclick="sendMessageAndReceiveResponse()">Send</button>
+                </div>
+            </div>
+        </div>
+        <div class="video-container">
+            <h2>Video Feed</h2>
+            <img src="{{ url_for('video_feed') }}" alt="Video Feed" id="video-feed">
+            <p id="congestion-level">Congestion Level: Loading...</p>
+        </div>
+    </div>
+
+    <script>
+        function sendMessageAndReceiveResponse() {
+            var userMessage = document.getElementById('userInput').value;
+            appendMessage('User', userMessage);
+
+            // Clear the input field
+            document.getElementById('userInput').value = '';
+
+            // Make a request to the Flask server to get the response
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: userMessage }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                var botResponse = data.message;
+                appendMessage('Bot', botResponse);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function appendMessage(sender, message) {
+            var chatContainer = document.getElementById('chat');
+            var messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message'); // Add chat-message class
+            messageDiv.innerHTML = '<strong>' + sender + ':</strong> ' + message;
+            chatContainer.insertBefore(messageDiv, chatContainer.firstChild); // Insert message above previous messages
+            chatContainer.scrollTop = 0; // Scroll to top to show new messages
+        }
+
+        // Function to update congestion level
+        function updateCongestionLevel() {
+            fetch('/congestion_level') // Fetch congestion level from server
+            .then(response => response.json())
+            .then(data => {
+                var congestionLevel = data.level;
+                document.getElementById('congestion-level').innerText = 'Congestion Level: ' + congestionLevel;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Update congestion level every 5 seconds (adjust interval as needed)
+        setInterval(updateCongestionLevel, 5000);
+    </script>
+</body>
+</html>

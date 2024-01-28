@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nav-GPT</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #chat-container {
+            position: absolute;right:  25px;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #f8f8f8;
+            height: 70vh;
+            width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            direction: rtl; /* Set text direction to right-to-left */
+        }
+
+        #user-input {
+            position: absolute;right:  40px; bottom:100px;
+            width: 340px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            margin: 0;
+            outline: 1px;
+            border-radius: 5px;
+        }
+
+        #send-button {
+            position: absolute;right:  150px; bottom: 30px;
+            width: 100px;
+            padding: 10px;
+            background-color: gray;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #search-bar-container {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            z-index: 1000;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+        .search-bar {
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div id="search-bar-container">
+        <input type="text" class="search-bar" placeholder="Source">
+        <input type="text" class="search-bar" placeholder="Destination">
+    </div>
+    <div id="chat-container"></div>
+    <input type="text" id="user-input" placeholder="Type your message...">
+    <button id="send-button" onclick="sendMessage()">Send</button>
+
+    <script>
+        function sendMessage() {
+            var userInputElement = document.getElementById("user-input");
+            var userMessage = userInputElement.value;
+
+            if (userMessage.toLowerCase() === 'exit') {
+                alert("Goodbye!");
+                window.close();
+            } else {
+                updateUserChatHistory("You: " + userMessage);
+                simulateChatbotResponse(userMessage);
+            }
+
+            // Clear the user input
+            userInputElement.value = "";
+        }
+
+        function simulateChatbotResponse(userMessage) {
+            // Simulate a chatbot response (replace this with your logic)
+            var chatbotResponse = "This is a simulated response from the Chatbot.";
+
+            updateChatHistory(chatbotResponse);
+        }
+
+        function updateChatHistory(message) {
+            var chatContainerElement = document.getElementById("chat-container");
+            chatContainerElement.innerHTML += message + "<br>";
+            chatContainerElement.scrollTop = chatContainerElement.scrollHeight;
+        }
+
+        function updateUserChatHistory(message) {
+            var chatContainerElement = document.getElementById("chat-container");
+            chatContainerElement.innerHTML += message + "<br>";
+            chatContainerElement.scrollTop = chatContainerElement.scrollHeight;
+        }
+    </script>
+</body>
+</html>
